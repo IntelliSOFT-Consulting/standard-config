@@ -19,7 +19,7 @@
                                 {{ "REGISTRATION_TIMINGS_TEXT_KEY" | translate }}
                             </li>
                             <li>
-                               {{ "REGISTRATION_OPD_DAYS_TEXT_KEY" | translate }}
+                                {{ "REGISTRATION_OPD_DAYS_TEXT_KEY" | translate }}
                             </li>
                             <li>
                                 {{ "REGISTRATION_SUNDAYS_HOLIDAY_TEXT_KEY" | translate }}
@@ -40,23 +40,28 @@
                 <tr>
                     <td class="logo">
                         <p>
-                            <img src="/bahmni_config/openmrs/apps/registration/registrationCardLayout/images/bahmni-icon.png" style="width: 12mm; height: 12mm; "/>
+                            <img
+                                    src="/bahmni_config/openmrs/apps/registration/registrationCardLayout/images/bahmni-icon.png"
+                                    style="width: 100%; height: auto;"
+                            />
                         </p>
                     </td>
-                    <td class="print-table-right-header">
-                        <h3>
-                        {{ "REGISTRATION_INSTITUTE_NAME_TEXT_KEY" | translate }}
-                        </h3>
-                        <h3 class="print-center">{{ "REGISTRATION_INSTITUTE_REGISTERED_TEXT_KEY" |  translate }}</h3>
-                    </td>
-                    <td class="registrationCard-photo">
-                        <img ng-src="{{patient.image}}" style="width: 20mm; height: 20mm; "
-                             onerror="this.onerror=null;this.src='../images/blank.jpeg';"/>
+                </tr>
+                <tr class="institute-name-wrapper">
+                    <td >
+                        <p class="institute-name">
+                            {{ "REGISTRATION_INSTITUTE_NAME_TEXT_KEY" | translate }}
+                        </p>
                     </td>
                 </tr>
                 <tr>
-                    <td colspan="3" class="print-center registrationCard-location">
-                    {{ "REGISTRATION_INSTITUTE_ADDRESS" | translate }}
+                    <td class="">
+                        <img
+                                class="registration-img"
+                                alt="https://cdn.pixabay.com/photo/2016/04/01/10/11/avatar-1299805_1280.png"
+                                ng-src="{{patient.image}}"
+                                onerror="this.onerror=null;this.src='../images/blank.jpeg';"
+                        />
                     </td>
                 </tr>
             </table>
