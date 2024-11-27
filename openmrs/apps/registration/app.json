@@ -25,6 +25,7 @@
             "activeVisitUuid"
         ],
         "config" : {
+            "mandatoryPersonAttributes": ["typeofPatient"],
             "patientInformation": {
                 "additionalPatientInformation": {
                     "title": "Additional Patient Information",
