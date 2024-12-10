@@ -69,7 +69,7 @@
             },
             "addressHierarchy": {
                 "showAddressFieldsTopDown": true,
-                "strictAutocompleteFromLevel": "address2"
+                "strictAutocompleteFromLevel": "cityVillage"
             },
             "relationshipTypeMap": {
                 "Doctor":"provider",
@@ -133,7 +133,7 @@
             },
             "addressHierarchy": {
                 "showAddressFieldsTopDown": false,
-                "strictAutocompleteFromLevel": "address2"
+                "strictAutocompleteFromLevel": "cityVillage"
             }
         }
 }
