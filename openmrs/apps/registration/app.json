@@ -127,8 +127,7 @@
                 }
             },
             "addressHierarchy": {
-                "showAddressFieldsTopDown": false,
-                "strictAutocompleteFromLevel": "cityVillage"
+                "showAddressFieldsTopDown": false
             }
         }
 }
