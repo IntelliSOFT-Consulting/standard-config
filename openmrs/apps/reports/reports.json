@@ -64,6 +64,38 @@
       "sqlPath": "/etc/bahmni_config/openmrs/apps/reports/sql/diagnosisCount.sql"
     }
   },
+  "PatientVisitsByType": {
+    "name": "Patient Visits by Type",
+    "type": "MRSGeneric",
+    "requiredPrivilege": "app:reports",
+    "config": {
+      "sqlPath": "/etc/bahmni_config/openmrs/apps/reports/sql/patient_visits_by_type.sql"
+    }
+  },
+  "detailedPatientVisitsByType": {
+    "name": "Detailed Patient Visits by Type",
+    "type": "MRSGeneric",
+    "requiredPrivilege": "app:reports",
+    "config": {
+      "sqlPath": "/etc/bahmni_config/openmrs/apps/reports/sql/detailed_patient_visits_by_type.sql"
+    }
+  },
+  "cataractMetrics": {
+    "name": "Cataract Metrics",
+    "type": "MRSGeneric",
+    "requiredPrivilege": "app:reports",
+    "config": {
+      "sqlPath": "/etc/bahmni_config/openmrs/apps/reports/sql/cataract_metrics.sql"
+    }
+  },
+  "surgicalOutcomes": {
+    "name": "Surgical Outcomes",
+    "type": "MRSGeneric",
+    "requiredPrivilege": "app:reports",
+    "config": {
+      "sqlPath": "/etc/bahmni_config/openmrs/apps/reports/sql/surgical_outcomes.sql"
+    }
+  },
   "diabetes": {
     "name": "Diabetes",
     "type": "obsCount",
