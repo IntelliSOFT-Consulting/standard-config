@@ -21,5 +21,5 @@ JOIN concept_name cn_diagnosis ON cn_diagnosis.concept_id = obs.value_coded
     AND cn_diagnosis.voided = FALSE
 WHERE obs.voided = 0
   AND obs.concept_id = @diagnosis_concept_id
-  AND obs.obs_datetime BETWEEN CONCAT('#startDate#', ' 00:00:00') AND CONCAT('#endDate#', ' 23:59:59')
+  AND obs.obs_datetime BETWEEN CONCAT('#startDate#', ' 00:00:00') AND DATE_FORMAT('#endDate#', '%Y-%m-%d 23:59:59')
 GROUP BY cn_diagnosis.name;

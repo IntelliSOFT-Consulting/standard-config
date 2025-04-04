@@ -29,6 +29,6 @@ FROM obs o
                        AND comorb.concept_id = (SELECT concept_id FROM concept WHERE uuid = 'COMORBIDITY_UUID')
                        AND comorb.voided = 0
 WHERE
-    DATE(o.obs_datetime) BETWEEN DATE('2025-01-01') AND DATE('2025-04-04')
+    DATE(o.obs_datetime) BETWEEN CONCAT('#startDate#', ' 00:00:00') AND DATE_FORMAT('#endDate#', '%Y-%m-%d 23:59:59')
 GROUP BY surg_type.name, outcome_type.name
 ORDER BY COUNT(DISTINCT o.person_id) DESC;

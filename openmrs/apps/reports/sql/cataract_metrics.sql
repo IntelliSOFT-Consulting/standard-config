@@ -49,7 +49,7 @@ FROM obs main
                         AND p.voided = 0
 WHERE
     proc_type.name IN ('Manual SICS + PCIOL (rigid lens)', 'Phaco-Surgery')
-  AND DATE(main.obs_datetime) BETWEEN DATE('2025-01-01') AND DATE('2025-04-04')
+  AND DATE(main.obs_datetime) BETWEEN CONCAT('#startDate#', ' 00:00:00') AND DATE_FORMAT('#endDate#', '%Y-%m-%d 23:59:59')
 GROUP BY
     proc_type.name, patient_category.name
 ORDER BY
