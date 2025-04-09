@@ -55,7 +55,7 @@
       "applyDateRangeFor": "obsDate",
       "visitTypesToFilter": []
     }
-  },
+  },  
   "DiagnosisCountReport": {
     "name": "Diagnosis Count Report",
     "type": "MRSGeneric",
@@ -102,6 +102,14 @@
     "requiredPrivilege": "app:reports",
     "config": {
       "sqlPath": "/etc/bahmni_config/openmrs/apps/reports/sql/surgical_outcomes.sql"
+    }
+  },
+  "bdsecDiagnosisCountReport": {
+    "name": "HMIS Diagnosis Count Report",
+    "type": "MRSGeneric",
+    "requiredPrivilege": "app:reports",
+    "config": {
+      "sqlPath": "/etc/bahmni_config/openmrs/apps/reports/sql/hmisDiagnosisReport.sql"
     }
   },
   "diabetes": {
