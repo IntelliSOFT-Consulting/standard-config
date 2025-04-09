@@ -1,18 +1,39 @@
+/*
+ * HMIS Diagnosis Report - Demographics breakdown
+ *
+ * Consistent optimization patterns to be applied throughout the report:
+ * 1. Use consistent column names and formats:
+ *    - Male columns should be named: belowOneMale, betweenOneAndFourMale, etc.
+ *    - Female columns should be named: belowOneFemale, betweenOneAndFourFemale, etc.
+ *    - Display labels should follow format 'M: 0-1', 'F: 5-14', etc.
+ * 
+ * 2. Use INNER JOIN instead of LEFT JOIN where applicable
+ * 
+ * 3. Use consistent date pattern for parameter substitution:
+ *    - Replace DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') with 
+ *      DATE_FORMAT('#endDate#','%Y-%m-%d 23:59:59')
+ *
+ * 4. Use SUM() instead of COUNT() for the Total column to get accurate totals
+ *
+ * 5. Age range at highest level should be 0-200 not 0-100 to avoid excluding 
+ *    any patients over 100 years old
+ */
+
 select 
    'H10-557 Conjunctivitis' as 'National classification of Disease(NCoD)',
-  count(belowOneMale) as '0 - 1',
-  count(betweenOneAndFourMale) as '1 - 4',
-  count(betweenFiveAndFourteenMale) as '5 - 14',
-  count(betweenFifteenAndTwentyNineMale) as '15 - 29',
-  count(betweenThirtyAndSixtyFourMale) as '30 - 64',
-  count(AboveSixtyFourMale) as '>=65',
-  count(belowOne) as '0 - 1',
-  count(betweenOneAndFour) as '1 - 4',
-  count(betweenFiveAndFourteen) as '5 - 14',
-  count(betweenFifteenAndTwentyNine) as '15 - 29',
-  count(betweenThirtyAndSixtyFourFemale) as '30 - 64',
-  count(AboveSixtyFour) as '>=65',
-  count(Total) as 'Total' 
+  count(belowOneMale) as 'M: 0-1',
+  count(betweenOneAndFourMale) as 'M: 1-4',
+  count(betweenFiveAndFourteenMale) as 'M: 5-14',
+  count(betweenFifteenAndTwentyNineMale) as 'M: 15-29',
+  count(betweenThirtyAndSixtyFourMale) as 'M: 30-64',
+  count(AboveSixtyFourMale) as 'M: ≥65',
+  count(belowOneFemale) as 'F: 0-1',
+  count(betweenOneAndFourFemale) as 'F: 1-4',
+  count(betweenFiveAndFourteenFemale) as 'F: 5-14',
+  count(betweenFifteenAndTwentyNineFemale) as 'F: 15-29',
+  count(betweenThirtyAndSixtyFourFemale) as 'F: 30-64',
+  count(AboveSixtyFourFemale) as 'F: ≥65',
+  sum(Total) as 'Total' 
 from (
 select 
  CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 0 and 1 and gender = 'M') THEN 1 END belowOneMale,
@@ -20,28 +41,28 @@ select
  CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 5 and 14 and gender = 'M') THEN 1 END betweenFiveAndFourteenMale,
  CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 15 and 29 and gender = 'M') THEN 1 END betweenFifteenAndTwentyNineMale,
  CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 30 and 64 and gender = 'M') THEN 1 END betweenThirtyAndSixtyFourMale,
-  CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 65 and 100 and gender = 'M') THEN 1 END AboveSixtyFourMale,
- CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 0 and 1 and gender = 'F') THEN 1 END belowOne,
- CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 1 and 4 and gender = 'F') THEN 1 END betweenOneAndFour,
- CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 5 and 14 and gender = 'F') THEN 1 END betweenFiveAndFourteen,
- CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 15 and 29 and gender = 'F') THEN 1 END betweenFifteenAndTwentyNine,
+ CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 65 and 200 and gender = 'M') THEN 1 END AboveSixtyFourMale,
+ CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 0 and 1 and gender = 'F') THEN 1 END belowOneFemale,
+ CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 1 and 4 and gender = 'F') THEN 1 END betweenOneAndFourFemale,
+ CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 5 and 14 and gender = 'F') THEN 1 END betweenFiveAndFourteenFemale,
+ CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 15 and 29 and gender = 'F') THEN 1 END betweenFifteenAndTwentyNineFemale,
  CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 30 and 64 and gender = 'F') THEN 1 END betweenThirtyAndSixtyFourFemale,
- CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 65 and 100 and gender = 'F') THEN 1 END AboveSixtyFour,
- CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 0 and 100 and gender in ('F','M')) THEN 1 END Total
+ CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 65 and 200 and gender = 'F') THEN 1 END AboveSixtyFourFemale,
+ CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 0 and 200 and gender in ('F','M')) THEN 1 END Total
  from (  
-select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
-left join person p on obs.person_id = p.person_id 
+select obs.person_id, gender, birthdate, concept_id, obs_datetime, encounter_id, value_coded as 'diagnosis', obs.voided from obs
+inner join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
-and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT('#endDate#','%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Conjunctivitis unspecified (diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
-)a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
-obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
+)a inner join (select person_id as pid, max(encounter_id) maxdate from obs where concept_id = 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT('#endDate#','%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults
- 
+
 union all
 
 select 
@@ -78,12 +99,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Cataract unspecified (diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -125,12 +146,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "S00-1787 Head (Injury of eye and orbit)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -171,12 +192,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Glaucoma unspecified (diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -217,12 +238,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Aphakia (diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -263,12 +284,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Disorders Of Ocular Muscles Binocular Movement Accommodation And Refraction" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -309,12 +330,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Presbyopia (diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -355,12 +376,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Blepharitis (Diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -401,12 +422,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Corneal ulcer (diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -447,12 +468,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Keratitis (Diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -493,12 +514,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Retinal vascular occlusions (diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -539,12 +560,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Keratoconjunctivitis sicca (diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -585,12 +606,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Chalazion unspecified (diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -631,12 +652,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Keratitis (Other superficial keratitis without conjunctivitis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -677,12 +698,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Myopia (diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -723,12 +744,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Entropion (Entropion and trichiasis of eyelid)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -769,12 +790,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Corneal scars or opacities (diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -815,12 +836,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Astigmatism (diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -861,12 +882,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Scleritis (diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -907,12 +928,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Amblyopia (Amblyopia ex anopsia)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -953,12 +974,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Pain (Ocular pain)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -999,12 +1020,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Tuberculosis (Iridocyclitis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -1013,19 +1034,19 @@ union all
 
 select 
    'H53-596 Night Blindness' as '',
-  count(belowOneMale) as '0 - 1',
-  count(betweenOneAndFourMale) as '1 - 4',
-  count(betweenFiveAndFourteenMale) as '5 - 14',
-  count(betweenFifteenAndTwentyNineMale) as '15 - 29',
-  count(betweenThirtyAndSixtyFourMale) as '30 - 64',
-  count(AboveSixtyFourMale) as '>=65',
-  count(belowOne) as '0 - 1',
-  count(betweenOneAndFour) as '1 - 4',
-  count(betweenFiveAndFourteen) as '5 - 14',
-  count(betweenFifteenAndTwentyNine) as '15 - 29',
-  count(betweenThirtyAndSixtyFour) as '30 - 64',
-  count(AboveSixtyFour) as '>=65',
-  count(Total) as 'Total' 
+  count(belowOneMale) as 'M: 0-1',
+  count(betweenOneAndFourMale) as 'M: 1-4',
+  count(betweenFiveAndFourteenMale) as 'M: 5-14',
+  count(betweenFifteenAndTwentyNineMale) as 'M: 15-29',
+  count(betweenThirtyAndSixtyFourMale) as 'M: 30-64',
+  count(AboveSixtyFourMale) as 'M: ≥65',
+  count(belowOneFemale) as 'F: 0-1',
+  count(betweenOneAndFourFemale) as 'F: 1-4',
+  count(betweenFiveAndFourteenFemale) as 'F: 5-14',
+  count(betweenFifteenAndTwentyNineFemale) as 'F: 15-29',
+  count(betweenThirtyAndSixtyFourFemale) as 'F: 30-64',
+  count(AboveSixtyFourFemale) as 'F: ≥65',
+  sum(Total) as 'Total' 
 from (
 select 
  CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 0 and 1 and gender = 'M') THEN 1 END belowOneMale,
@@ -1033,25 +1054,25 @@ select
  CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 5 and 14 and gender = 'M') THEN 1 END betweenFiveAndFourteenMale,
  CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 15 and 29 and gender = 'M') THEN 1 END betweenFifteenAndTwentyNineMale,
  CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 30 and 64 and gender = 'M') THEN 1 END betweenThirtyAndSixtyFourMale,
-  CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 65 and 100 and gender = 'M') THEN 1 END AboveSixtyFourMale,
- CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 0 and 1 and gender = 'F') THEN 1 END belowOne,
- CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 1 and 4 and gender = 'F') THEN 1 END betweenOneAndFour,
- CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 5 and 14 and gender = 'F') THEN 1 END betweenFiveAndFourteen,
- CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 15 and 29 and gender = 'F') THEN 1 END betweenFifteenAndTwentyNine,
- CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 30 and 64 and gender = 'F') THEN 1 END betweenThirtyAndSixtyFour,
- CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 65 and 100 and gender = 'F') THEN 1 END AboveSixtyFour,
- CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 0 and 100 and gender in ('F','M')) THEN 1 END Total
+ CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 65 and 200 and gender = 'M') THEN 1 END AboveSixtyFourMale,
+ CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 0 and 1 and gender = 'F') THEN 1 END belowOneFemale,
+ CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 1 and 4 and gender = 'F') THEN 1 END betweenOneAndFourFemale,
+ CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 5 and 14 and gender = 'F') THEN 1 END betweenFiveAndFourteenFemale,
+ CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 15 and 29 and gender = 'F') THEN 1 END betweenFifteenAndTwentyNineFemale,
+ CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 30 and 64 and gender = 'F') THEN 1 END betweenThirtyAndSixtyFourFemale,
+ CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 65 and 200 and gender = 'F') THEN 1 END AboveSixtyFourFemale,
+ CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 0 and 200 and gender in ('F','M')) THEN 1 END Total
  from (  
-select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
-left join person p on obs.person_id = p.person_id 
+select obs.person_id, gender, birthdate, concept_id, obs_datetime, encounter_id, value_coded as 'diagnosis', obs.voided from obs
+inner join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
-and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT('#endDate#','%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Night Blindness (Diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
-)a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
-obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#startDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
+)a inner join (select person_id as pid, max(encounter_id) maxdate from obs where concept_id = 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT('#endDate#','%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
 
@@ -1091,12 +1112,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Glaucoma unspecified (diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -1137,12 +1158,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Ectropion (Lagophthalmos)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -1183,12 +1204,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Double Vision (Diplopia)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -1229,12 +1250,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Corneal neovascularization (diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -1275,12 +1296,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Papilloedema (diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -1321,12 +1342,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Glaucoma unspecified (diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -1367,12 +1388,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Nystagmus (Nystagmus and other irregular eye movements)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -1413,12 +1434,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Tuberculosis (Iridocyclitis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -1459,12 +1480,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Pain (Pain unspecified)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -1505,12 +1526,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Senile ectropion of eyelid (diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -1551,12 +1572,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Glaucoma (Primary angle-closure glaucoma)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -1597,12 +1618,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Bullous aphakic keratopathy following cataract surgery (diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
@@ -1643,12 +1664,12 @@ select
 select obs.person_id, gender, birthdate, concept_id, obs_datetime  , encounter_id , value_coded as 'diagnosis', obs.voided from obs
 left join person p on obs.person_id = p.person_id 
  where concept_id =
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) 
 and obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59')  and 
 value_coded = (select concept_id from concept_name where name = "Primary open-angle glaucoma (diagnosis)" and concept_name_type = "FULLY_SPECIFIED" and voided = 0) 
  and obs.voided = 0
 )a inner join (select person_id as pid , concept_id as cid, max(encounter_id) maxdate from obs where concept_id = 
-(select concept_id from concept_name where name = 'ICD 11 Diagnosis' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
+(select concept_id from concept_name where name = 'ICD 11 Diagnosis,Right eye' and concept_name_type = 'FULLY_SPECIFIED' and voided = 0) and 
 obs_datetime between DATE_FORMAT('#startDate#','%Y-%m-01') and DATE_FORMAT(('#endDate#'),'%Y-%m-%d 23:59:59') group by pid) c on 
 a.person_id = c.pid and a.encounter_id = c.maxdate 
 )tresults 
