@@ -1,5 +1,5 @@
 select 
-   'H10-557 Conjunctivitis' as '',
+   'H10-557 Conjunctivitis' as 'National classification of Disease(NCoD)',
   count(belowOneMale) as '0 - 1',
   count(betweenOneAndFourMale) as '1 - 4',
   count(betweenFiveAndFourteenMale) as '5 - 14',
@@ -10,7 +10,7 @@ select
   count(betweenOneAndFour) as '1 - 4',
   count(betweenFiveAndFourteen) as '5 - 14',
   count(betweenFifteenAndTwentyNine) as '15 - 29',
-  count(betweenThirtyAndSixtyFour) as '30 - 64',
+  count(betweenThirtyAndSixtyFourFemale) as '30 - 64',
   count(AboveSixtyFour) as '>=65',
   count(Total) as 'Total' 
 from (
@@ -25,7 +25,7 @@ select
  CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 1 and 4 and gender = 'F') THEN 1 END betweenOneAndFour,
  CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 5 and 14 and gender = 'F') THEN 1 END betweenFiveAndFourteen,
  CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 15 and 29 and gender = 'F') THEN 1 END betweenFifteenAndTwentyNine,
- CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 30 and 64 and gender = 'F') THEN 1 END betweenThirtyAndSixtyFour,
+ CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 30 and 64 and gender = 'F') THEN 1 END betweenThirtyAndSixtyFourFemale,
  CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 65 and 100 and gender = 'F') THEN 1 END AboveSixtyFour,
  CASE WHEN (TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) between 0 and 100 and gender in ('F','M')) THEN 1 END Total
  from (  
