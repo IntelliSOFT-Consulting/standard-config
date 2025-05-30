@@ -94,7 +94,7 @@
     "type": "config",
     "extensionParams": {
       "formName": "History and Examination",
-      "default": true
+      "default": false
     },
     "order": 1,
     "requiredPrivilege": "app:clinical:history"
