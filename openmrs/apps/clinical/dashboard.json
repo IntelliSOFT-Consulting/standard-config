@@ -18,10 +18,6 @@
                     "countyDistrict"
                 ]
             },
-            "allergies": {
-                "type":"allergies",
-                "displayOrder": 2
-            },
             "forms-v2-react": {
                 "type": "formsV2React",
                 "displayOrder": 17,
@@ -90,38 +86,10 @@
                     "logo": "../images/bahmniLogo.png"
                 }
             },
-            "radiology":{  
-                "translationKey":"DASHBOARD_TITLE_RADIOLOGY_KEY",
-                "type":"radiology",
-                "showDetailsButton":true,
-                "displayOrder":6
-            },
             "programs":{  
                 "translationKey":"DASHBOARD_TITLE_PROGRAMS_KEY",
                 "type":"programs",
                 "displayOrder":13
-            },
-            "radiologyOrders":{  
-                "orderType":"Radiology Order",
-                "type":"ordersControl",
-                "translationKey":"DASHBOARD_TITLE_RADIOLOGY_ORDERS_KEY",
-                "displayOrder":14,
-                "dashboardConfig":{  
-                    "conceptNames":[  
-                        "Summary"
-                    ],
-                    "numberOfVisits":4
-                }
-            },
-            "pacs":{  
-                "orderType":"Radiology Order",
-                "type":"pacsOrders",
-                "translationKey":"DASHBOARD_TITLE_PACS_KEY",
-                "displayOrder":11,
-                "dashboardConfig":{  
-                    "pacsImageUrl":"/oviyam2/oviyam?patientID={{patientID}}&accessionNumber={{orderNumber}}",
-                    "numberOfVisits":4
-                }
             },
             "labOrdersDisplayControl":{
                 "translationKey":"DASHBOARD_TITLE_LAB_ORDERS_DISPLAY_CONTROL_KEY",
@@ -135,18 +103,6 @@
                 "expandedViewConfig":{
                     "conceptNames":[],
                     "showDetailsButton":true
-                }
-            },
-            "bacteriologyResults":{  
-                "translationKey":"DASHBOARD_TITLE_BACTERIOLOGY_RESULTS_KEY",
-                "type":"bacteriologyResultsControl",
-                "displayOrder": 20,
-                "scope":"All",
-                "orderType":"",
-                "dashboardConfig":{  
-                    "conceptNames":[  
-                        "BACTERIOLOGY CONCEPT SET"
-                    ]
                 }
             },
             "labResults":{  
@@ -210,68 +166,6 @@
                 },
                 "hideEmptyDisplayControl": true
             },
-            "flowsheet": {
-                "type": "flowSheet",
-                "title": "Vitals Flow Sheet",
-                "displayOrder": 12,
-                "dashboardConfig": {
-                    "latestCount": "5",
-                    "groupBy": "obstime",
-                    "obsConcepts": [
-                        "Pulse",
-                        "Arterial blood oxygen saturation (pulse oximeter)",
-                        "Respiratory rate",
-                        "Temperature",
-                        "Systolic blood pressure",
-                        "Diastolic blood pressure",
-                        "Body position"
-                    ]
-                },
-                "allFlowSheetDetails": {
-                    "latestCount": "10",
-                    "groupBy": "obstime",
-                    "obsConcepts": [
-                        "Pulse",
-                        "Arterial blood oxygen saturation (pulse oximeter)",
-                        "Respiratory rate",
-                        "Temperature",
-                        "Systolic blood pressure",
-                        "Diastolic blood pressure",
-                        "Body position"
-                    ]
-                }
-            },
-            "historyAndExaminations":{  
-                "translationKey":"DASHBOARD_TITLE_HISTORY_AND_EXAMINATIONS_KEY",
-                "type":"vitals",
-                "isObservation":true,
-                "displayOrder": 10,
-                "dashboardConfig":{  
-                    "showDetailsButton":true,
-                    "conceptNames":[  
-                        "Chief Complaint Record",
-                        "History of present illness",
-                        "Smoking status",
-                        "Consultation Images",
-                        "Consultation Videos"
-                    ],
-                    "numberOfVisits":2
-                },
-                "expandedViewConfig":{
-                    "conceptNames":[
-                        "Chief Complaint Record",
-                        "History of present illness",
-                        "Smoking status",
-                        "Consultation Images",
-                        "Consultation Videos"
-                    ],
-                    "numberOfVisits":2,
-                    "showDetailsButton":true,
-                    "pivotTable":{  
-
-                    }
-                }
-            },
             "visits":{  
                 "translationKey":"DASHBOARD_TITLE_VISITS_KEY",
                 "type":"visits",
@@ -281,12 +175,6 @@
                     "maximumNoOfVisits":8,
                     "groupByVisits":true
                 }
-            },
-            "admissionDetails":{  
-                "translationKey":"DASHBOARD_TITLE_ADMISSION_DETAILS_KEY",
-                "type":"admissionDetails",
-                "displayOrder":18,
-                "showDetailsButton":true
             },
             "conditions": {
                 "translationKey":"CONDITION_LIST_DISPLAY_CONTROL_TITLE",
@@ -323,24 +211,6 @@
                 "expandedViewConfig":{
                     "conceptNames":[],
                     "showDetailsButton":true
-                }
-            },
-            "Form 2 Obs To Obs": {
-                "displayType": "Half-Page",
-                "translationKey": "DASHBOARD_TITLE_FORMS2_OBS_TO_OBS_DISPLAY_CONTROL_KEY",
-                "type": "obsToObsFlowSheet",
-                "dashboardConfig": {
-                    "numberOfVisits": 1,
-                    "formNames": [],
-                    "groupByConcept": "",
-                    "isEditable": true,
-                    "conceptNames": []
-                },
-                "expandedViewConfig": {
-                    "formNames": [],
-                    "isEditable": true,
-                    "groupByConcept": "",
-                    "conceptNames": []
                 }
             }
         }
