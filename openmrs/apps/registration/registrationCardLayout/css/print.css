@@ -39,11 +39,7 @@ h1, h2, h3 {
 }
 
 .registration-img{
-  width: 100% !important;
-  height: auto !important;
-  object-fit: contain !important;
-  margin: 0px auto 0px auto !important;
-  align-self: center;
+  display: none !important;
 }
 
 /* line 27, print.scss */
