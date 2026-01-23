@@ -158,6 +158,32 @@
     "order": 3,
     "requiredPrivilege": "app:clinical"
   },
+  "bahmniClinicalPatientsSearchCounselling": {
+    "id": "bahmni.clinical.patients.search.Counselling",
+    "extensionPointId": "org.bahmni.patient.search",
+    "type": "config",
+    "extensionParams": {
+      "searchHandler": "emrapi.sqlSearch.counselling",
+      "translationKey": "MODULE_LABEL_COUNSELLING_KEY",
+      "forwardUrl": "#/default/patient/{{patientUuid}}/dashboard"
+    },
+    "label": "COUNSELLING",
+    "order": 4,
+    "requiredPrivilege": "app:clinical"
+  },
+  "bahmniClinicalPatientsSearchOphthalmology": {
+    "id": "bahmni.clinical.patients.search.Ophthalmology",
+    "extensionPointId": "org.bahmni.patient.search",
+    "type": "config",
+    "extensionParams": {
+      "searchHandler": "emrapi.sqlSearch.ophthalmology",
+      "translationKey": "MODULE_LABEL_OPHTHALMOLOGY_KEY",
+      "forwardUrl": "#/default/patient/{{patientUuid}}/dashboard"
+    },
+    "label": "Ophthalmology",
+    "order": 5,
+    "requiredPrivilege": "app:clinical"
+  },
   "bahmniClinicalPatientsSearchAllPatients": {
     "id": "bahmni.clinical.patients.search.allPatients",
     "extensionPointId": "org.bahmni.patient.search",
