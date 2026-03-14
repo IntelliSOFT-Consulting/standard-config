@@ -113,7 +113,7 @@
       "extensionParams": {
         "searchHandler": "emrapi.sqlSearch.labVisit",
         "translationKey": "MODULE_LABEL_LAB_KEY",
-        "forwardUrl": "#/default/patient/{{patientUuid}}/dashboard?queueName=LAB"
+        "forwardUrl": "#/default/patient/{{patientUuid}}/dashboard/orders?queueName=LAB"
       },
       "label": "Lab",
       "order": 5,
