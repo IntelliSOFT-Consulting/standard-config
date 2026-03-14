@@ -174,5 +174,16 @@
             "fetchDelay": 2000,
             "serializeSearch": false
         }
+    },
+    "bahmniClinicalConsultationSpecificForm": {
+    "id": "bahmni.clinical.consultation.mySpecialForm",
+    "extensionPointId": "org.bahmni.clinical.consultation.board",
+    "type": "link",
+    "label": "Special Assessment",
+    "url": "concept-set-group/observations",
+    "extensionParams": {
+        "conceptNames": ["Amsler Grid Test"],
+        "encounterType": "INVESTIGATION"
     }
+}
 }
