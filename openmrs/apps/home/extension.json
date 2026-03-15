@@ -140,5 +140,16 @@
     "icon": "fa fa-flask",
     "order": 15,
     "requiredPrivilege": "app:lab-lite"
+  },
+  "or": {
+    "id": "bahmni.clinical.specialty",
+    "extensionPointId": "org.bahmni.home.dashboard",
+    "type": "link",
+    "translationKey": "MODULE_LABEL_CLINICAL_KEY",
+    "url": "../clinical/index.html#/default/patient/search?configName=specialty",
+    "icon": "fa-stethoscope",
+    "order": 16,
+    "requiredPrivilege": "app:clinical"
   }
+
 }
