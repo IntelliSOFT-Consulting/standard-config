@@ -65,7 +65,7 @@
       },
       "label": "ACTIVE",
       "order": 1,
-      "requiredPrivilege": "app:clinical"
+      "requiredPrivilege": "queue:active"
     },
     "bahmniClinicalPatientsSearchOpdOne": {
       "id": "bahmni.clinical.patients.search.OpdOne",
@@ -78,7 +78,7 @@
       },
       "label": "OPDONE",
       "order": 2,
-      "requiredPrivilege": "app:clinical"
+      "requiredPrivilege": "queue:opdone"
     },
     "bahmniClinicalPatientsSearchOpdTwo": {
       "id": "bahmni.clinical.patients.search.OpdTwo",
@@ -91,7 +91,7 @@
       },
       "label": "OPDTWO",
       "order": 3,
-      "requiredPrivilege": "app:clinical"
+      "requiredPrivilege": "queue:opdtwo"
     },
     "bahmniClinicalPatientsSearchEmergency": {
       "id": "bahmni.clinical.patients.search.Emergency",
@@ -104,7 +104,7 @@
       },
       "label": "EMERGENCY",
       "order": 4,
-      "requiredPrivilege": "app:clinical"
+      "requiredPrivilege": "queue:emergency"
     },
     "bahmniClinicalPatientsSearchLab": {
       "id": "bahmni.clinical.patients.search.Lab",
@@ -117,7 +117,7 @@
       },
       "label": "LAB",
       "order": 5,
-      "requiredPrivilege": "app:clinical"
+      "requiredPrivilege": "queue:lab"
     },
     "bahmniClinicalPatientsSearchPharmacy": {
       "id": "bahmni.clinical.patients.search.Pharmacy",
@@ -130,7 +130,7 @@
       },
       "label": "PHARMACY",
       "order": 6,
-      "requiredPrivilege": "app:clinical"
+      "requiredPrivilege": "queue:pharmacy"
     },
     "bahmniClinicalPatientsSearchOptical": {
       "id": "bahmni.clinical.patients.search.Optical",
@@ -143,7 +143,7 @@
       },
       "label": "OPTICAL",
       "order": 7,
-      "requiredPrivilege": "app:clinical"
+      "requiredPrivilege": "queue:optical"
     },
     "bahmniClinicalPatientsSearchCounselling": {
       "id": "bahmni.clinical.patients.search.Counselling",
@@ -156,7 +156,7 @@
       },
       "label": "COUNSELLING",
       "order": 8,
-      "requiredPrivilege": "app:clinical"
+      "requiredPrivilege": "queue:counselling"
     },
     "bahmniClinicalPatientsSearchMinorOr": {
       "id": "bahmni.clinical.patients.search.MinorOr",
@@ -169,7 +169,7 @@
       },
       "label": "MINOR_OR",
       "order": 9,
-      "requiredPrivilege": "app:clinical"
+      "requiredPrivilege": "queue:minoror"
     },
     "bahmniClinicalPatientsSearchMajorOr": {
       "id": "bahmni.clinical.patients.search.MajorOr",
@@ -182,7 +182,7 @@
       },
       "label": "MAJOR_OR",
       "order": 10,
-      "requiredPrivilege": "app:clinical"
+      "requiredPrivilege": "queue:majoror"
     },
     "bahmniClinicalPatientsSearchOphthalmology": {
       "id": "bahmni.clinical.patients.search.Ophthalmology",
@@ -195,7 +195,7 @@
       },
       "label": "OPHTHALMOLOGY",
       "order": 11,
-      "requiredPrivilege": "app:clinical"
+      "requiredPrivilege": "queue:opthalmology"
     },
     "bahmniClinicalPatientsSearchMedicalBoard": {
       "id": "bahmni.clinical.patients.search.MedicalBoard",
@@ -208,7 +208,7 @@
       },
       "label": "MEDICAL_BOARD",
       "order": 12,
-      "requiredPrivilege": "app:clinical"
+      "requiredPrivilege": "queue:medicalboard"
     },
     "bahmniClinicalPatientsSearchDiagnostic": {
       "id": "bahmni.clinical.patients.search.Diagnostic",
@@ -221,7 +221,7 @@
       },
       "label": "DIAGNOSTIC",
       "order": 13,
-      "requiredPrivilege": "app:clinical"
+      "requiredPrivilege": "queue:diagnostic"
     },
     "bahmniClinicalPatientsSearchIpd": {
       "id": "bahmni.clinical.patients.search.Ipd",
@@ -234,7 +234,7 @@
       },
       "label": "IPD",
       "order": 14,
-      "requiredPrivilege": "app:clinical"
+      "requiredPrivilege": "queue:ipd"
     },
     "bahmniClinicalPatientsSearchFollowup": {
       "id": "bahmni.clinical.patients.search.Followup",
@@ -247,7 +247,7 @@
       },
       "label": "FOLLOWUP",
       "order": 15,
-      "requiredPrivilege": "app:clinical"
+      "requiredPrivilege": "queue:followup"
     },
     "bahmniClinicalPatientsSearchLiaison": {
       "id": "bahmni.clinical.patients.search.Liaison",
@@ -260,7 +260,7 @@
       },
       "label": "LIAISON",
       "order": 16,
-      "requiredPrivilege": "app:clinical"
+      "requiredPrivilege": "queue:liaison"
     },
     "bahmniClinicalPatientsSearchDischarge": {
       "id": "bahmni.clinical.patients.search.Discharge",
@@ -273,7 +273,7 @@
       },
       "label": "DISCHARGE",
       "order": 17,
-      "requiredPrivilege": "app:clinical"
+      "requiredPrivilege": "queue:discharge"
     },
     "bahmniClinicalPatientsSearchCataract": {
       "id": "bahmni.clinical.patients.search.Cataract",
@@ -286,7 +286,7 @@
       },
       "label": "CATARACT",
       "order": 18,
-      "requiredPrivilege": "app:clinical"
+      "requiredPrivilege": "queue:cataract"
     },
   "bahmniClinicalConceptSetGroupObservationsVitals": {
     "id": "bahmni.clinical.conceptSetGroup.observations.vitals",
